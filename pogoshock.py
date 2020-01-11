@@ -8,10 +8,11 @@ import cv2
 import re
 import os
 import time
+import webbrowser
 
 bbox = [0, 0, 1000, 1000]
-progressThreshold = -6 
-delay = 4
+progressThreshold = -3 # In percentage
+refreshRate = 5 # In seconds
 
 def setup():
     # Select the region of interest
@@ -23,25 +24,32 @@ def setup():
 
 def mainLoop():
     global progressThreshold
-    global delay
+    global refreshRate
     print("\nStarting the main loop...\n")
-    startTime = time.time()
     lastProgress = 0.0
     while True:
-        time.sleep(delay)
+        startTime = time.time()
         currentProgress = getProgress()
-        print("\nCurrent Progress : " + str(currentProgress))
         if currentProgress != None:
             progressDiff = currentProgress - lastProgress
-            print("Last Progress : " + str(lastProgress))
-            print('Progress diff : ' + str(progressDiff))
+            print("Current Progress : {:.2f}".format(currentProgress))
+            print("Last Progress : {:.2f}".format(lastProgress))
+            print("Progress diff : {:.2f}".format(progressDiff))
             if progressDiff <= progressThreshold:
-                os.system("say noob")
+                punishThePlayer()
             lastProgress = currentProgress
-        endTime = time.time()
-        loopTime = endTime - startTime
-        print("Loop execution time : " + str(loopTime) + "\n")
-        startTime = endTime
+
+            endTime = time.time()
+            loopTime = endTime - startTime
+            extraTime = refreshRate - loopTime
+            if extraTime > 0.0:
+                print("Loop time : {:.2f}\n".format(refreshRate))
+                time.sleep(extraTime)
+            else:
+                print("Warning: Loop time exceeded refresh rate")
+                print("Loop time : {:.2f}\n".format(loopTime))
+        else:
+            print("Couldn't recognize the current progress\n")
 
 
 def getProgress():
@@ -52,8 +60,8 @@ def getProgress():
     upper_yellow = np.array([100,255,255])
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
     invertedMask = cv2.bitwise_not(mask)
-    cv2.imshow("mask", invertedMask)
-    cv2.waitKey(0)
+    #cv2.imshow("mask", invertedMask)
+    #cv2.waitKey(0)
 
     # Get the text
     text = pytesseract.image_to_string(invertedMask)
@@ -65,6 +73,11 @@ def getProgress():
         progress = float(re.search(r'\d+\.\d', progressFinder.group()).group())
 
     return progress
+
+
+def punishThePlayer():
+    address = "https://youtu.be/ZQ7oqmikZDQ?t=47"
+    webbrowser.open(address, new=1)
 
 
 if __name__ == "__main__":
