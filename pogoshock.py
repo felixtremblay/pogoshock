@@ -8,19 +8,21 @@ import cv2
 import re
 import os
 import time
-import webbrowser
+#import webbrowser
+import serial
 
-bbox = [0, 0, 1000, 1000]
-progressThreshold = -3 # In percentage
+bbox = [0, 0, 800, 800]
+progressThreshold = -1 # In percentage
 refreshRate = 5 # In seconds
+shockTime = 1000
+serialConnection = None
 
 def setup():
-    # Select the region of interest
-    #image = np.array(ImageGrab.grab(bbox=(0, 0, 1000, 1000)))
-    #global boundingBox
-    #boundingBox = cv2.selectROI(image, False)
-    #print(boundingBox)
-    pass
+    global serialConnection
+    print("\nInitializing the serial connection...")
+    serialConnection = serial.Serial('/dev/tty.wchusbserial14120', 9600)
+    time.sleep(3)
+    print("Serial connection established with {}".format(serialConnection.name))
 
 def mainLoop():
     global progressThreshold
@@ -76,9 +78,9 @@ def getProgress():
 
 
 def punishThePlayer():
-    address = "https://youtu.be/ZQ7oqmikZDQ?t=47"
-    webbrowser.open(address, new=1)
-
+    #address = "https://youtu.be/ZQ7oqmikZDQ?t=47"
+    #webbrowser.open(address, new=1)
+    serialConnection.write("{}\n".format(shockTime).encode('utf-8'))
 
 if __name__ == "__main__":
     setup()
