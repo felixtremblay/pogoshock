@@ -6,9 +6,7 @@ import pytesseract
 import numpy as np
 import cv2
 import re
-import os
 import time
-#import webbrowser
 import serial
 from mss import mss
 
