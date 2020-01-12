@@ -12,9 +12,9 @@ import time
 import serial
 
 bbox = [0, 0, 800, 800]
-progressThreshold = -1 # In percentage
-refreshRate = 5 # In seconds
-shockTime = 1000
+progressThreshold = -4 # In percentage
+refreshRate = 3 # In seconds
+shockTime = 300 # In ms
 serialConnection = None
 
 def setup():
@@ -69,7 +69,7 @@ def getProgress():
     text = pytesseract.image_to_string(invertedMask)
 
     # Find the value
-    progressFinder = re.search(r'FTcuber\s[^d]\s\d+\.\d', text)
+    progressFinder = re.search(r'electrocuted\s[^d]\s\d+\.\d', text)
     progress = None
     if progressFinder:
         progress = float(re.search(r'\d+\.\d', progressFinder.group()).group())
